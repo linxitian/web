@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>亲子故事会 · Kids Story Time</title>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      background: linear-gradient(135deg, #f6ede3, #fdf7f1);
+      color: #3b3025;
+      text-align: center;
+    }
+
+    /* 按要求：不可修改的 .page，只把背景色改成题目给的蜂蜜金 */
+    .page {
+      display: inline-block;
+      background-color: #FCE9C9;
+      box-shadow: 0 0 30px rgba(80, 58, 35, 0.25);
+      text-align: left;
+      max-width: 720px;
+    }
+
+    /* 群组选择器（完全保留） */
+    h1, h2, h3, h4, h5, h6 {
+      color: #5b4636;
+      letter-spacing: 1px;
+    }
+
+    .center { text-align: center; }
+    .right { text-align: right; }
+
+    /* p#intro 强调 */
+    p#intro {
+      font-size: 140%;
+      font-weight: bold;
+      color: #c8493b;
+    }
+
+    .intro-text {
+      line-height: 1.7;
+      letter-spacing: 0.5px;
+    }
+
+    .section-title {
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      background-color: #fdf4e5;
+      font-size: 90%;
+    }
+
+    th {
+      background-color: #f2ddc2;
+      font-weight: bold;
+      text-align: left;
+      line-height: 2.2;
+    }
+
+    td {
+      line-height: 2.0;
+    }
+
+    table tr:nth-child(even) { background-color: #fbf0de; }
+    table tr:hover { background-color: #eed8be; }
+
+    /* 后代选择器 */
+    div table a {
+      font-weight: bold;
+      font-size: 110%;
+      color: #8b3b30;
+    }
+
+    /* 链接伪类 */
+    a:link { color: #b6553b; text-decoration: none; }
+    a:visited { color: #7a7b52; text-decoration: none; }
+    a:hover { color: #e36a4c; text-decoration: underline; }
+    a:active { color: #3c4f9f; text-decoration: underline; }
+
+    /* class 链接 */
+    a.red:link { color: #e25b3d; }
+    a.red:active { color: #3046a1; }
+    a.blue:link { color: #4b7f60; }
+    a.blue:active { color: #a53aa4; }
+
+    /* 首字与首行 */
+    p::first-letter {
+      font-size: 180%;
+      color: #c45b3f;
+    }
+
+    div::first-line {
+      color: #b04832;
+      font-weight: bold;
+    }
+
+    .notice {
+      font-size: 90%;
+      line-height: 1.6;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, rgba(91,70,54,0), rgba(91,70,54,0.6), rgba(91,70,54,0));
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- 顶部标题区 -->
+  <h1 class="center">亲子故事会 · Kids Story Time</h1>
+
+  <div class="divider"></div><br>
+
+  <!-- 活动介绍区 -->
+  <div>
+    <h2 id="intro" class="center">温暖童趣的一小时 · 陪孩子听故事</h2>
+
+    <p class="intro-text right">
+      本周六上午十点，我们将一起走进故事王国，与可爱的孩子们一起聆听奇妙又温暖的绘本故事。
+    </p>
+
+    <p class="intro-text center">
+      现场准备了软垫、毛绒玩偶和小手工，让孩子在轻松的氛围里释放想象力，与爸妈共享快乐时光。
+    </p>
+
+    <p id="intro">
+      本次活动名额有限，请务必提前报名，故事会需要家长全程陪同。
+    </p>
+  </div>
+
+  <br><div class="divider"></div><br>
+
+  <!-- 活动报名情况表格区 -->
+  <div>
+    <h3 class="section-title">活动报名名单</h3>
+
+    <table>
+      <tr>
+        <th>编号</th>
+        <th>姓名</th>
+        <th>联系方式</th>
+        <th>状态</th>
+      </tr>
+      <tr>
+        <td>01</td>
+        <td><a href="https://example.com/p1">多多</a></td>
+        <td>188****1201</td>
+        <td>已报名</td>
+      </tr>
+      <tr>
+        <td>02</td>
+        <td><a href="https://example.com/p2">球球</a></td>
+        <td>139****2234</td>
+        <td>待确认</td>
+      </tr>
+      <tr>
+        <td>03</td>
+        <td><a href="https://example.com/p3">乐乐</a></td>
+        <td>136****8899</td>
+        <td>已确认</td>
+      </tr>
+      <tr>
+        <td>04</td>
+        <td>小云</td>
+        <td>137****5578</td>
+        <td>候补</td>
+      </tr>
+    </table>
+  </div>
+
+  <br><div class="divider"></div><br>
+
+  <!-- 页面链接区 -->
+  <div class="center">
+    <p>
+      <a class="red" href="https://hongchenwusdnu.github.io/bookstore/job4.html">查看往期活动照片</a><br>
+      <a class="blue" href="job3.html">在线咨询活动详情</a>
+    </p>
+  </div>
+
+  <br><div class="divider"></div><br>
+
+  <!-- 底部公告区 -->
+  <div class="notice">
+    活动地点：亲子社区中心 · 一楼阅读角<br>
+    请提前 10 分钟签到并为孩子准备一瓶饮用水<br>
+    若孩子对花生或牛奶等食物过敏，请提前告知工作人员
+  </div>
+
+  <br>
+
+</div>
+
+</body>
+</html>
