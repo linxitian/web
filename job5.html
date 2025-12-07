@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>XX电商 · 订单录入与销售看板</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .box { border:1px solid #ddd; padding:10px; margin:10px 0; }
+    .clock { font-size: 20px; font-weight: bold; color: #336699; }
+    label { display:inline-block; width:120px; }
+    table { border-collapse: collapse; width:100%; margin-top:10px; }
+    th, td { border:1px solid #ccc; padding:4px 8px; text-align:center; }
+  </style>
+</head>
+<body>
+
+<!-- ===================== 顶部标题 ===================== -->
+<script>
+  /**
+   * document.write()
+   * 功能：向 HTML 页面“直接写入”内容，相当于插入 HTML 代码。
+   * 特点：在页面加载时执行，适合输出标题、提示区域。
+   */
+  document.write("<h1>琳习田电商 · 运营后台 · 订单录入与销售看板</h1>");
+  document.write("<p>欢迎使用内部工具，实时查看订单与销售情况。</p>");
+
+  // ===================== 全局优惠 + 加价温馨提示 =====================
+  document.write(`
+  <div style="padding:12px; background:#eef9ff; border-left:5px solid #3aa0e6; margin:10px 0; font-size:15px;">
+    <strong>💡 温馨提示：本店当前可享受的优惠与加价政策如下：</strong>
+    <ul style="margin:8px 0 0 20px; line-height:1.6;">
+      <li>🎉 VIP 客户享受 <strong>9 折优惠</strong></li>
+      <li>⚡ 加急发货价格会 <strong>×1.1</strong></li>
+      <li>⏰ 每小时前 10 分钟再享 <strong>8.5 折</strong></li>
+    </ul>
+  </div>
+  `);
+
+  // ===================== 当前分钟动态活动提示 =====================
+  var nowForBanner = new Date();            // Date()：创建一个时间对象
+  var minuteForBanner = nowForBanner.getMinutes(); // getMinutes()：获取当前分钟（0–59）
+
+  if (minuteForBanner >= 0 && minuteForBanner <= 9) {
+    document.write(`
+      <div style="padding:12px; background:#fffbe6; border-left:5px solid #f4d06f; margin:10px 0; font-size:15px;">
+        ⏳ 当前为前 10 分钟！本单可额外享受 <strong>8.5 折</strong> 时段优惠！
+      </div>
+    `);
+  } else {
+    document.write(`
+      <div style="padding:12px; background:#f5f5f5; border-left:5px solid #ccc; margin:10px 0; font-size:15px;">
+        🕒 小贴士：每个整点前 10 分钟享受 8.5 折优惠，请留意下单时间～
+      </div>
+    `);
+  }
+</script>
+
+<!-- ===================== 时钟区 ===================== -->
+<div class="box">
+  <h2>当前系统时间</h2>
+  <!-- 此区域的文字由 JavaScript 动态更新 -->
+  <div id="clock" class="clock"></div>
+</div>
+
+<!-- ===================== 订单录入 ===================== -->
+<div class="box">
+  <h2>新建订单</h2>
+
+  <!-- onsubmit="return validateForm()"：提交表单前调用 JS 做校验 -->
+  <form onsubmit="return validateForm();">
+    <p>
+      <label>客户名称：</label>
+      <input type="text" id="customerName">
+    </p>
+    <p>
+      <label>商品单价（¥）：</label>
+      <input type="text" id="priceInput">
+    </p>
+    <p>
+      <label>数量（件）：</label>
+      <input type="text" id="qtyInput">
+    </p>
+    <p>
+      <label>客户类型：</label>
+      <select id="customerType">
+        <option value="normal">普通客户</option>
+        <option value="vip">VIP 客户</option>
+      </select>
+    </p>
+    <p>
+      <label>加急发货：</label>
+      <input type="checkbox" id="urgentFlag"> 是
+    </p>
+    <p><button type="submit">添加订单</button></p>
+  </form>
+
+  <div id="orderResult"></div>
+</div>
+
+<!-- ===================== 销售看板 ===================== -->
+<div class="box">
+  <h2>销售看板</h2>
+  <div id="dashboard"></div>
+  <div id="orderTable"></div>
+</div>
+
+<script>
+  // ================================================================
+  //                          模拟时钟功能
+  // ================================================================
+
+  /**
+   * padZero(n)
+   * 功能：将数字补零，例如 7 → "07"
+   * 用途：让日期时间保持两位展示格式
+   */
+  function padZero(n) {
+    return n < 10 ? "0" + n : n;
+  }
+
+  /**
+   * updateClock()
+   * 功能：获取当前时间 → 格式化 → 写入页面
+   * 技术点：
+   *   - Date()                  获取当前时间
+   *   - getElementById()        获取页面指定 id 的元素
+   *   - innerHTML               用于设置元素的 HTML 内容
+   */
+  function updateClock() {
+    var now = new Date();
+    var y = now.getFullYear();
+    var m = now.getMonth() + 1;
+    var d = now.getDate();
+    var hh = now.getHours();
+    var mm = now.getMinutes();
+    var ss = now.getSeconds();
+
+    var weekNames = ["日", "一", "二", "三", "四", "五", "六"];
+    var w = weekNames[now.getDay()];
+
+    var timeStr =
+      y + "年" + padZero(m) + "月" + padZero(d) +
+      "日 星期" + w + " " +
+      padZero(hh) + ":" + padZero(mm) + ":" + padZero(ss);
+
+    // document.getElementById("clock")
+    // 功能：返回页面中 id="clock" 的那个元素
+    document.getElementById("clock").innerHTML = timeStr;
+  }
+
+  updateClock();               // 页面刚加载时调用一次
+  setInterval(updateClock, 1000); // setInterval：每 1000ms 调用一次 → 实现走动的时钟
+
+
+  // ================================================================
+  //                         全局订单数组
+  // ================================================================
+  /**
+   * orders 数组，保存所有订单记录
+   * 每一个元素都是一个订单对象 {name, qty, price, finalTotal ... }
+   */
+  var orders = [];
+
+
+
+  // ================================================================
+  //                         表单校验逻辑
+  // ================================================================
+  function validateForm() {
+    /**
+     * document.getElementById("xxx").value
+     * 说明：从页面中获取 id="xxx" 的输入框内容
+     */
+    var nameStr = document.getElementById("customerName").value;
+    var priceStr = document.getElementById("priceInput").value;
+    var qtyStr = document.getElementById("qtyInput").value;
+    var typeStr = document.getElementById("customerType").value;
+    var urgentChecked = document.getElementById("urgentFlag").checked;
+
+    var valid = true;
+
+    // 客户名称校验
+    if (nameStr == null || nameStr.trim() === "") {
+      alert("客户名称不能为空！");
+      valid = false;
+    }
+
+    // parseFloat()：把字符串转成浮点型数字
+    var price = parseFloat(priceStr);
+    if (isNaN(price) || price <= 0) {
+      alert("商品单价必须是大于 0 的数字！");
+      valid = false;
+    }
+
+    // parseInt()：把字符串转成整数
+    var qty = parseInt(qtyStr, 10);
+    if (isNaN(qty) || qty <= 0) {
+      alert("数量必须是大于 0 的整数！");
+      valid = false;
+    }
+
+    if (!valid) {
+      document.getElementById("orderResult").innerHTML =
+        "<p>订单录入失败，请检查输入。</p>";
+      return false;
+    }
+
+    processOrder(nameStr.trim(), price, qty, typeStr === "vip", urgentChecked);
+    return false;
+  }
+
+
+
+  // ================================================================
+  //                         订单业务逻辑
+  // ================================================================
+  function processOrder(customerName, price, quantity, isVip, isUrgent) {
+    var baseTotal = price * quantity;
+
+    var afterVip = isVip ? baseTotal * 0.9 : baseTotal;
+
+    var afterUrgent = isUrgent ? afterVip * 1.1 : afterVip;
+
+    var now = new Date();
+    var minute = now.getMinutes();
+
+    var hitTimeDiscount = false;
+    var finalTotal = afterUrgent;
+
+    if (minute >= 0 && minute <= 9) {
+      finalTotal *= 0.85;
+      hitTimeDiscount = true;
+    }
+    var hitActivity = false;
+    if (hitTimeDiscount && quantity >= 5){
+      finalTotal *= 0.8;
+      hitActivity = true;
+    }
+
+    var isImportant = isVip && finalTotal > 1000;
+
+    var tipsHtml = "<ul>";
+    tipsHtml += isVip ? "<li>VIP 9折已应用</li>" : "<li>普通客户无 VIP 优惠</li>";
+    tipsHtml += isUrgent ? "<li>加急 ×1.1 已应用</li>" : "<li>未加急</li>";
+    tipsHtml += hitTimeDiscount ? "<li>命中前十分钟 ×0.85</li>" : "<li>无时段折扣</li>";
+    tipsHtml += hitActivity ? "<li>特殊活动 ×0.8</li>" : "<li>数量未达5件，无活动折扣</li>";
+    tipsHtml += "</ul>";
+
+    document.getElementById("orderResult").innerHTML =
+      "<h3>订单录入成功：</h3>" +
+      "<p>客户名称：" + customerName + "</p>" +
+      "<p>基础金额：¥" + baseTotal.toFixed(2) + "</p>" +
+      "<p>VIP 后：¥" + afterVip.toFixed(2) + "</p>" +
+      "<p>加急后：¥" + afterUrgent.toFixed(2) + "</p>" +
+      "<p>最终金额：¥" + finalTotal.toFixed(2) + "</p>" +
+      "<p>订单类型：" + (isImportant ? "大额 VIP" : "普通订单") + "</p>" +
+      "<div style='background:#eef; padding:8px;'>优惠详情：" + tipsHtml + "</div>";
+
+    orders.push({
+      name: customerName,
+      price: price,
+      qty: quantity,
+      baseTotal: baseTotal,
+      finalTotal: finalTotal,
+      isVip: isVip,
+      isUrgent: isUrgent,
+      hitTimeDiscount: hitTimeDiscount,
+      hitActivity: hitActivity,
+    });
+
+    renderDashboard();
+  }
+
+
+
+  // ================================================================
+  //                         销售看板
+  // ================================================================
+  function renderDashboard() {
+    var count = orders.length;
+    var totalSales = 0;
+
+    // for 循环累加订单金额（知识点：循环语句）
+    for (var i = 0; i < orders.length; i++) {
+      totalSales += orders[i].finalTotal;
+    }
+
+    var avg = count > 0 ? totalSales / count : 0;
+
+    /**
+     * innerHTML:
+     * 功能：修改一个元素内部显示的 HTML 内容
+     * 用法：document.getElementById(xxx).innerHTML = "内容";
+     */
+    document.getElementById("dashboard").innerHTML =
+      "<p>订单数：" + count + "</p>" +
+      "<p>销售总额：¥" + totalSales.toFixed(2) + "</p>" +
+      "<p>平均客单价：¥" + avg.toFixed(2) + "</p>";
+
+    var tableHtml = "<table><tr>" +
+      "<th>客户名称</th><th>单价</th><th>数量</th><th>基础金额</th><th>最终金额</th><th>VIP</th><th>加急</th><th>前十分钟</th><th>活动</th></tr>";
+
+    for (var j = 0; j < orders.length; j++) {
+      var o = orders[j];
+      tableHtml += "<tr>" +
+        "<td>" + o.name + "</td>" +
+        "<td>" + o.price.toFixed(2) + "</td>" +
+        "<td>" + o.qty + "</td>" +
+        "<td>" + o.baseTotal.toFixed(2) + "</td>" +
+        "<td>" + o.finalTotal.toFixed(2) + "</td>" +
+        "<td>" + (o.isVip ? "是" : "否") + "</td>" +
+        "<td>" + (o.isUrgent ? "是" : "否") + "</td>" +
+        "<td>" + (o.hitTimeDiscount ? "是" : "否") + "</td>" +
+        "<td>" + (o.hitActivity ? "是" : "否") + "</td>" +
+        "</tr>";
+    }
+
+    tableHtml += "</table>";
+    document.getElementById("orderTable").innerHTML = tableHtml;
+  }
+</script>
+
+</body>
+</html>
